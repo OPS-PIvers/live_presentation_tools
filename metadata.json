@@ -1,0 +1,5 @@
+{
+  "name": "Interactive Presentation Tool",
+  "description": "An interactive presentation tool to demonstrate workflows on screenshots, images, or videos. Features include pan/zoom, spotlight, and a click-tracking system to record and replay professional demonstrations.",
+  "requestFramePermissions": []
+}
