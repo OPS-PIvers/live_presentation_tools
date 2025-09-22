@@ -1,15 +1,19 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Tool, CanvasTransform, SpotlightState, ClickRecord } from '../types';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { Tool, CanvasTransform, SpotlightState } from '../types';
 
 interface CanvasProps {
   mediaUrl: string | null;
   mediaType: 'image' | 'video' | null;
+  transform: CanvasTransform;
+  spotlight: SpotlightState | null;
   activeTool: Tool;
   isCapturing: boolean;
-  onRecordClick: (x: number, y: number, transform: CanvasTransform, spotlight: SpotlightState | null) => void;
   isPlaying: boolean;
-  clickSequence: ClickRecord[];
-  onReplayFinished: () => void;
+  replayCursorPos: { x: number; y: number } | null;
+  onTransformChange: (transform: CanvasTransform) => void;
+  onSpotlightChange: (spotlight: SpotlightState | null) => void;
+  onRecordClick: (x: number, y: number, transform: CanvasTransform, spotlight: SpotlightState | null) => void;
+  onFile: (file: File) => void;
 }
 
 const INITIAL_TRANSFORM: CanvasTransform = { scale: 1, x: 0, y: 0 };
@@ -17,99 +21,21 @@ const CIRCLE_RADIUS = 60;
 const ZOOM_FACTOR = 1.5;
 const DRAG_THRESHOLD = 10; // pixels
 
-export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, mediaType, activeTool, isCapturing, onRecordClick, isPlaying, clickSequence, onReplayFinished }) => {
-  const [transform, setTransform] = useState<CanvasTransform>(INITIAL_TRANSFORM);
-  const [spotlight, setSpotlight] = useState<SpotlightState | null>(null);
+export const Canvas: React.FC<CanvasProps> = ({
+  mediaUrl, mediaType, transform, spotlight, activeTool, isCapturing, isPlaying, replayCursorPos,
+  onTransformChange, onSpotlightChange, onRecordClick, onFile
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  
-  const [replayState, setReplayState] = useState({
-      cursorPos: { x: -100, y: -100 },
-      currentIndex: -1,
-  });
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const resetView = useCallback(() => {
-    setTransform(INITIAL_TRANSFORM);
-    setSpotlight(null);
-  }, []);
-
-  useEffect(() => {
-    // This effect manages the entire replay lifecycle.
-    if (!isPlaying) {
-      // When not playing, hide the replay cursor.
-      // Do NOT reset the transform/spotlight here, as that was causing the bug.
-      // The canvas should remain in its last state after a user interaction.
-      setReplayState({ cursorPos: { x: -100, y: -100 }, currentIndex: -1 });
-      return;
-    }
-    
-    // --- Replay is starting ---
-    
-    // 1. Reset the canvas view to its initial state for the replay.
-    setTransform(INITIAL_TRANSFORM);
-    setSpotlight(null);
-
-    let currentStep = 0;
-    let animationFrameId: number;
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    const animateStep = () => {
-        if (currentStep >= clickSequence.length) {
-            onReplayFinished();
-            return;
-        }
-
-        const target = clickSequence[currentStep];
-        const startPos = currentStep === 0 
-            ? { x: canvasRef.current!.clientWidth / 2, y: canvasRef.current!.clientHeight / 2 } 
-            : { x: clickSequence[currentStep - 1].x, y: clickSequence[currentStep - 1].y };
-        
-        let startTime: number | null = null;
-        const duration = 800; // ms to move cursor
-
-        const moveCursor = (timestamp: number) => {
-            if (!startTime) startTime = timestamp;
-            const progress = Math.min((timestamp - startTime) / duration, 1);
-            
-            const newX = startPos.x + (target.x - startPos.x) * progress;
-            const newY = startPos.y + (target.y - startPos.y) * progress;
-
-            setReplayState({ cursorPos: { x: newX, y: newY }, currentIndex: currentStep });
-
-            if (progress < 1) {
-                animationFrameId = requestAnimationFrame(moveCursor);
-            } else {
-                // Arrived at target: apply the recorded state from this step
-                setTransform(target.toolState.transform);
-                setSpotlight(target.toolState.spotlight);
-                
-                // Pause for effect, then move to the next step
-                timeoutId = setTimeout(() => {
-                    currentStep++;
-                    animateStep();
-                }, 400);
-            }
-        };
-        animationFrameId = requestAnimationFrame(moveCursor);
-    };
-
-    // 2. Start the animation.
-    // Use a small timeout to ensure React has processed the state reset from step 1.
-    const startTimeoutId = setTimeout(animateStep, 50);
-
-    // 3. Cleanup function to stop animations if component unmounts or `isPlaying` becomes false.
-    return () => {
-        clearTimeout(startTimeoutId);
-        clearTimeout(timeoutId);
-        cancelAnimationFrame(animationFrameId);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, onReplayFinished]); // clickSequence is intentionally omitted to prevent re-triggering mid-replay
-
+    onTransformChange(INITIAL_TRANSFORM);
+    onSpotlightChange(null);
+  }, [onTransformChange, onSpotlightChange]);
 
   const getClickCoords = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
@@ -118,27 +44,20 @@ export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, mediaType, activeTool,
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // This handler now ONLY deals with non-spotlight tools.
-    // Spotlight logic is handled entirely in mouse down/move/up.
     if (e.detail !== 1 || isPlaying || activeTool === Tool.SPOTLIGHT) return;
-    
     const { x, y } = getClickCoords(e);
-    
     let nextTransform = transform;
-    
+
     if (activeTool === Tool.PAN_ZOOM) {
       const newScale = transform.scale * ZOOM_FACTOR;
       const { width, height } = canvasRef.current!.getBoundingClientRect();
-      // Point on unscaled image
       const imgX = (x - transform.x) / transform.scale;
       const imgY = (y - transform.y) / transform.scale;
-      // New translation to center this point
       const newX = width / 2 - imgX * newScale;
       const newY = height / 2 - imgY * newScale;
-      
       nextTransform = { scale: newScale, x: newX, y: newY };
-      setTransform(nextTransform);
-      setSpotlight(null); // Clear spotlight when panning/zooming
+      onTransformChange(nextTransform);
+      onSpotlightChange(null);
     }
 
     if (isCapturing) {
@@ -151,75 +70,109 @@ export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, mediaType, activeTool,
     e.preventDefault();
     resetView();
   };
-  
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isPlaying) return;
-    
-    if (activeTool === Tool.SPOTLIGHT) {
-      e.preventDefault();
-      setIsDragging(true);
-      setDragStart(getClickCoords(e));
-    }
+    if (isPlaying || activeTool !== Tool.SPOTLIGHT) return;
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStart(getClickCoords(e));
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging || activeTool !== Tool.SPOTLIGHT || isPlaying) return;
-    
     const currentPos = getClickCoords(e);
-    const distance = Math.sqrt(
-      Math.pow(currentPos.x - dragStart.x, 2) + Math.pow(currentPos.y - dragStart.y, 2)
-    );
+    const distance = Math.hypot(currentPos.x - dragStart.x, currentPos.y - dragStart.y);
 
-    // Only start drawing the rectangle if the user has dragged a meaningful amount
     if (distance < DRAG_THRESHOLD) {
-        setSpotlight(null);
-        return;
+      onSpotlightChange(null);
+      return;
     }
-
     const x = Math.min(dragStart.x, currentPos.x);
     const y = Math.min(dragStart.y, currentPos.y);
     const width = Math.abs(dragStart.x - currentPos.x);
     const height = Math.abs(dragStart.y - currentPos.y);
-    setSpotlight({ type: 'rect', x, y, width, height, radius: 0 });
+    onSpotlightChange({ type: 'rect', x, y, width, height, radius: 0 });
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging || activeTool !== Tool.SPOTLIGHT) {
-      if (isDragging) setIsDragging(false);
-      return;
+        if (isDragging) setIsDragging(false);
+        return;
     }
-    
     const endPos = getClickCoords(e);
-    const distance = Math.sqrt(
-      Math.pow(endPos.x - dragStart.x, 2) + Math.pow(endPos.y - dragStart.y, 2)
-    );
+    const distance = Math.hypot(endPos.x - dragStart.x, endPos.y - dragStart.y);
 
     let finalSpotlight: SpotlightState;
-
-    if (distance < DRAG_THRESHOLD) { // This was a click.
+    if (distance < DRAG_THRESHOLD) {
       finalSpotlight = { type: 'circle', x: endPos.x, y: endPos.y, radius: CIRCLE_RADIUS, width: 0, height: 0 };
-    } else { // This was a drag.
+    } else {
       const x = Math.min(dragStart.x, endPos.x);
       const y = Math.min(dragStart.y, endPos.y);
       const width = Math.abs(dragStart.x - endPos.x);
       const height = Math.abs(dragStart.y - endPos.y);
       finalSpotlight = { type: 'rect', x, y, width, height, radius: 0 };
     }
-    
-    setSpotlight(finalSpotlight);
+    onSpotlightChange(finalSpotlight);
 
     if (isCapturing) {
       onRecordClick(endPos.x, endPos.y, transform, finalSpotlight);
     }
-    
     setIsDragging(false);
   };
+  
+    useEffect(() => {
+    const pasteTarget = canvasRef.current;
+    if (!pasteTarget) return;
+
+    const handlePaste = (event: ClipboardEvent) => {
+        const items = event.clipboardData?.items;
+        if (!items) return;
+        for (const item of items) {
+            if (item.type.includes('image')) {
+                const file = item.getAsFile();
+                if (file) onFile(file);
+                break;
+            }
+        }
+    };
+
+    const handleDrop = (event: DragEvent) => {
+        event.preventDefault();
+        pasteTarget.classList.remove('bg-gray-700', 'border-cyan-400');
+        if (event.dataTransfer?.files?.[0]) {
+            onFile(event.dataTransfer.files[0]);
+        }
+    };
+    
+    const handleDragOver = (event: DragEvent) => {
+        event.preventDefault();
+        pasteTarget.classList.add('bg-gray-700', 'border-cyan-400');
+    };
+
+    const handleDragLeave = (event: DragEvent) => {
+        event.preventDefault();
+        pasteTarget.classList.remove('bg-gray-700', 'border-cyan-400');
+    };
+
+    pasteTarget.addEventListener('paste', handlePaste);
+    pasteTarget.addEventListener('drop', handleDrop);
+    pasteTarget.addEventListener('dragover', handleDragOver);
+    pasteTarget.addEventListener('dragleave', handleDragLeave);
+
+    return () => {
+        pasteTarget.removeEventListener('paste', handlePaste);
+        pasteTarget.removeEventListener('drop', handleDrop);
+        pasteTarget.removeEventListener('dragover', handleDragOver);
+        pasteTarget.removeEventListener('dragleave', handleDragLeave);
+    };
+  }, [onFile]);
 
 
   return (
     <div
       ref={canvasRef}
-      className="w-full h-full bg-gray-800 overflow-hidden relative select-none cursor-crosshair"
+      className="w-full h-full bg-gray-800 overflow-hidden relative select-none cursor-crosshair focus:outline-none transition-colors duration-300"
+      tabIndex={0} // Makes the div focusable for paste events
       onClick={handleCanvasClick}
       onDoubleClick={handleDoubleClick}
       onMouseDown={handleMouseDown}
@@ -236,7 +189,7 @@ export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, mediaType, activeTool,
         </div>
       ) : (
          <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold border-4 border-dashed border-gray-600 rounded-2xl">
-            <p>Paste an image or drop a file here</p>
+            <p>Paste an image or drop a file on this slide</p>
          </div>
       )}
       
@@ -253,13 +206,13 @@ export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, mediaType, activeTool,
         </svg>
       )}
 
-      {isPlaying && (
+      {replayCursorPos && (
         <div 
           className="absolute z-50 w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-lg pointer-events-none transition-transform duration-75"
           style={{ 
             left: 0, 
             top: 0,
-            transform: `translate(${replayState.cursorPos.x - 16}px, ${replayState.cursorPos.y - 16}px)`,
+            transform: `translate(${replayCursorPos.x - 16}px, ${replayCursorPos.y - 16}px)`,
           }}
         >
            <div className="w-full h-full rounded-full bg-yellow-400 animate-ping"></div>

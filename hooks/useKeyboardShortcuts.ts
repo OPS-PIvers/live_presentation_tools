@@ -3,7 +3,9 @@ import { Tool } from '../types';
 
 export const useKeyboardShortcuts = (
   setActiveTool: (tool: Tool) => void,
-  toggleCapture: () => void
+  toggleCapture: () => void,
+  goToNextSlide: () => void,
+  goToPrevSlide: () => void
 ) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -24,6 +26,14 @@ export const useKeyboardShortcuts = (
           event.preventDefault();
           toggleCapture();
           break;
+        case 'arrowright':
+            event.preventDefault();
+            goToNextSlide();
+            break;
+        case 'arrowleft':
+            event.preventDefault();
+            goToPrevSlide();
+            break;
       }
     };
 
@@ -31,5 +41,5 @@ export const useKeyboardShortcuts = (
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setActiveTool, toggleCapture]);
+  }, [setActiveTool, toggleCapture, goToNextSlide, goToPrevSlide]);
 };

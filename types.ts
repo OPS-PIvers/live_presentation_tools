@@ -19,8 +19,17 @@ export interface SpotlightState {
   radius: number;
 }
 
+export interface Slide {
+  id: number;
+  mediaUrl: string | null;
+  mediaType: 'image' | 'video' | null;
+  transform: CanvasTransform;
+  spotlight: SpotlightState | null;
+}
+
 export interface ClickRecord {
   id: number;
+  slideIndex: number;
   x: number;
   y: number;
   toolState: {
