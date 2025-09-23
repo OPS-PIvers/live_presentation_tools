@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { Tool } from '../types';
 
 export const useKeyboardShortcuts = (
@@ -9,7 +10,11 @@ export const useKeyboardShortcuts = (
 ) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (['input', 'textarea'].includes((event.target as HTMLElement).tagName.toLowerCase())) {
+      if (
+        ['input', 'textarea'].includes(
+          (event.target as HTMLElement).tagName.toLowerCase()
+        )
+      ) {
         return;
       }
 
@@ -27,13 +32,13 @@ export const useKeyboardShortcuts = (
           toggleCapture();
           break;
         case 'arrowright':
-            event.preventDefault();
-            goToNextSlide();
-            break;
+          event.preventDefault();
+          goToNextSlide();
+          break;
         case 'arrowleft':
-            event.preventDefault();
-            goToPrevSlide();
-            break;
+          event.preventDefault();
+          goToPrevSlide();
+          break;
       }
     };
 
