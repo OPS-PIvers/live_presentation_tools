@@ -238,8 +238,10 @@ export const Canvas: React.FC<CanvasProps> = ({
           )}
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-500 text-2xl font-semibold border-4 border-dashed border-gray-600 rounded-2xl">
-          <p>Paste an image or drop a file on this slide</p>
+        <div className="w-full h-full flex items-center justify-center text-gray-500 text-lg sm:text-xl md:text-2xl font-semibold border-4 border-dashed border-gray-600 rounded-2xl">
+          <p className="p-4 text-center">
+            Paste an image or drop a file on this slide
+          </p>
         </div>
       )}
 

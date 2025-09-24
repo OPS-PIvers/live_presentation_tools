@@ -44,7 +44,7 @@ const ToolButton: React.FC<{
   title,
 }) => {
   const baseClasses =
-    'flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100';
+    'flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 sm:w-auto';
   const activeClasses = isToggle
     ? 'bg-red-600 text-white shadow-lg'
     : 'bg-cyan-500 text-white shadow-lg';
@@ -59,7 +59,7 @@ const ToolButton: React.FC<{
       title={finalTitle}
     >
       {icon}
-      <span className="text-xs mt-1 font-semibold">{label}</span>
+      <span className="text-xs mt-1 font-semibold hidden sm:block">{label}</span>
     </button>
   );
 };
@@ -79,9 +79,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   return (
     <div
       role="toolbar"
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-800 bg-opacity-80 backdrop-blur-sm p-3 rounded-xl shadow-2xl border border-gray-700"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md sm:w-auto sm:max-w-none sm:bottom-auto sm:top-4 bg-gray-800 bg-opacity-80 backdrop-blur-sm p-2 sm:p-3 rounded-xl shadow-2xl border border-gray-700"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4">
         <ToolButton
           label="Pan/Zoom"
           shortcut="A"
@@ -115,7 +115,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           isToggle={true}
           onClick={toggleCapture}
         />
-        <div className="w-px h-10 bg-gray-600"></div>
+        <div className="w-px h-10 bg-gray-600 hidden sm:block"></div>
         <ToolButton
           label="New Slide"
           title="Add New Slide"
@@ -127,7 +127,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             {currentSlideIndex + 1} / {totalSlides}
           </span>
         </div>
-        <div className="w-px h-10 bg-gray-600"></div>
+        <div className="w-px h-10 bg-gray-600 hidden sm:block"></div>
         <ToolButton
           label="Replay"
           title="Replay Click Sequence"

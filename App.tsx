@@ -217,7 +217,7 @@ const App: React.FC = () => {
         currentSlideIndex={currentSlideIndex}
         totalSlides={slides.length}
       />
-      <main className="flex-grow pt-[80px] relative">
+      <main className="flex-grow pb-[120px] sm:pb-0 sm:pt-[80px] relative">
         <div
           className="w-full h-full flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentSlideIndex * 100}%)` }}
@@ -254,18 +254,18 @@ const App: React.FC = () => {
             <button
               onClick={goToPrevSlide}
               disabled={currentSlideIndex === 0}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-gray-800 bg-opacity-60 rounded-full hover:bg-opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-1 sm:p-2 bg-gray-800 bg-opacity-50 rounded-full hover:bg-opacity-80 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               title="Previous Slide (Left Arrow)"
             >
-              <ChevronLeftIcon className="w-8 h-8 text-white" />
+              <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </button>
             <button
               onClick={goToNextSlide}
               disabled={currentSlideIndex === slides.length - 1}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-gray-800 bg-opacity-60 rounded-full hover:bg-opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-1 sm:p-2 bg-gray-800 bg-opacity-50 rounded-full hover:bg-opacity-80 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               title="Next Slide (Right Arrow)"
             >
-              <ChevronRightIcon className="w-8 h-8 text-white" />
+              <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </button>
           </>
         )}
