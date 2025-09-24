@@ -233,7 +233,6 @@ export const Canvas: React.FC<CanvasProps> = ({
               className="max-w-full max-h-full object-contain shadow-lg"
               controls
             >
-              <track kind="captions" />
             </video>
           )}
         </div>
