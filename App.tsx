@@ -157,7 +157,6 @@ const App: React.FC = () => {
       }
 
       const record = clickSequence[step];
-      if (!record) return;
 
       if (record.slideIndex !== currentSlideIndex) {
         setCurrentSlideIndex(record.slideIndex);
