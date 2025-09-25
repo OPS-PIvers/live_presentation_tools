@@ -2,6 +2,8 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 
 import { Tool, CanvasTransform, SpotlightState } from '../types';
 
+import { UploadIcon } from './icons';
+
 interface CanvasProps {
   mediaUrl: string | null;
   mediaType: 'image' | 'video' | null;
@@ -47,6 +49,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const canvasRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resetView = useCallback(() => {
     onTransformChange(INITIAL_TRANSFORM);
@@ -112,6 +115,19 @@ export const Canvas: React.FC<CanvasProps> = ({
     if (isPlaying) return;
     e.preventDefault();
     resetView();
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onFile(file);
+      // Reset the input so the same file can be selected again
+      e.target.value = '';
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -267,9 +283,24 @@ export const Canvas: React.FC<CanvasProps> = ({
         </div>
       ) : (
         <div className="w-full h-full flex items-center justify-center text-gray-500 text-lg sm:text-xl md:text-2xl font-semibold border-4 border-dashed border-gray-600 rounded-2xl">
-          <p className="p-4 text-center">
-            Paste an image or drop a file on this slide
-          </p>
+          <div className="p-4 text-center space-y-4">
+            <p>Paste, drop, or upload media files</p>
+            <button
+              onClick={handleUploadClick}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-base font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            >
+              <UploadIcon className="w-5 h-5" />
+              Choose File
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              className="hidden"
+              aria-label="Upload media file"
+            />
+          </div>
         </div>
       )}
 
