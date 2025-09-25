@@ -6,19 +6,25 @@ import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  const plugins = [react()];
+
+  // Only add visualizer in analyze mode to avoid TypeScript issues
+  if (process.env.npm_lifecycle_event === 'analyze') {
+    plugins.push(
+      visualizer({
+        filename: 'dist/bundle-analysis.html',
+        open: false,
+        gzipSize: true,
+      }) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    );
+  }
+
   return {
     server: {
       port: 3000,
       host: '0.0.0.0',
     },
-    plugins: [
-      react(),
-      visualizer({
-        filename: 'dist/bundle-analysis.html',
-        open: false,
-        gzipSize: true,
-      }),
-    ],
+    plugins,
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
