@@ -90,7 +90,7 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const updateSlideState = (slideIndex: number, updates: Partial<Slide>) => {
+  const updateSlideState = useCallback((slideIndex: number, updates: Partial<Slide>) => {
     setSlides((prev) => {
       const newSlides = [...prev];
       const slideToUpdate = newSlides[slideIndex];
@@ -99,7 +99,7 @@ const App: React.FC = () => {
       }
       return newSlides;
     });
-  };
+  }, []);
 
   const handleRecordClick = (
     x: number,
@@ -157,6 +157,7 @@ const App: React.FC = () => {
       }
 
       const record = clickSequence[step];
+      if (!record) return;
 
       if (record.slideIndex !== currentSlideIndex) {
         setCurrentSlideIndex(record.slideIndex);
@@ -199,8 +200,7 @@ const App: React.FC = () => {
     return () => {
       isCancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying]);
+  }, [isPlaying, clickSequence, currentSlideIndex, updateSlideState]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-900 font-sans overflow-hidden">

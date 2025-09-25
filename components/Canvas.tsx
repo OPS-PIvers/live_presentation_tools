@@ -81,6 +81,33 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
   };
 
+  const handleKeyboardActivation = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isPlaying || activeTool === Tool.SPOTLIGHT) return;
+
+    // For keyboard activation, use center of canvas as the click point
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    let nextTransform = transform;
+
+    if (activeTool === Tool.PAN_ZOOM) {
+      const newScale = transform.scale * ZOOM_FACTOR;
+      const { width, height } = rect;
+      const imgX = (centerX - transform.x) / transform.scale;
+      const imgY = (centerY - transform.y) / transform.scale;
+      const newX = width / 2 - imgX * newScale;
+      const newY = height / 2 - imgY * newScale;
+      nextTransform = { scale: newScale, x: newX, y: newY };
+      onTransformChange(nextTransform);
+      onSpotlightChange(null);
+    }
+
+    if (isCapturing) {
+      onRecordClick(centerX, centerY, nextTransform, null);
+    }
+  };
+
   const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isPlaying) return;
     e.preventDefault();
@@ -202,7 +229,8 @@ export const Canvas: React.FC<CanvasProps> = ({
       onClick={handleCanvasClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          handleCanvasClick(e as unknown as React.MouseEvent<HTMLDivElement>);
+          e.preventDefault();
+          handleKeyboardActivation(e);
         }
       }}
       onDoubleClick={handleDoubleClick}
