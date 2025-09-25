@@ -29,7 +29,7 @@ export const StepIcon: React.FC<{ className?: string }> = ({ className }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
-      d="M12 8v8m-4-4h8m8 0a9 9 0 11-18 0 9 9 0 0118 0z"
+      d="M8 6v12M10 12l6-6v12l-6-6z"
     />
   </svg>
 );
