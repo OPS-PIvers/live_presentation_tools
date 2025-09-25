@@ -17,9 +17,9 @@ export const ZoomIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-export const StepIcon: React.FC<IconProps> = (props) => (
+export const StepIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg
-    {...props}
+    className={className}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
