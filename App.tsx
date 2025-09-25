@@ -148,15 +148,11 @@ const App: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < clickSequence.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+    setCurrentStep(currentStep + 1);
   };
 
   const handlePrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    setCurrentStep(currentStep - 1);
   };
 
   const handleExitStepping = () => {
