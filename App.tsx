@@ -90,16 +90,19 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const updateSlideState = useCallback((slideIndex: number, updates: Partial<Slide>) => {
-    setSlides((prev) => {
-      const newSlides = [...prev];
-      const slideToUpdate = newSlides[slideIndex];
-      if (slideToUpdate) {
-        newSlides[slideIndex] = { ...slideToUpdate, ...updates };
-      }
-      return newSlides;
-    });
-  }, []);
+  const updateSlideState = useCallback(
+    (slideIndex: number, updates: Partial<Slide>) => {
+      setSlides((prev) => {
+        const newSlides = [...prev];
+        const slideToUpdate = newSlides[slideIndex];
+        if (slideToUpdate) {
+          newSlides[slideIndex] = { ...slideToUpdate, ...updates };
+        }
+        return newSlides;
+      });
+    },
+    []
+  );
 
   const handleRecordClick = (
     x: number,

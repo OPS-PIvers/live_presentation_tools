@@ -7,7 +7,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'prettier'
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -15,12 +15,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: [
-    'react',
-    '@typescript-eslint',
-    'import',
-    'prettier'
-  ],
+  plugins: ['react', '@typescript-eslint', 'import', 'prettier'],
   rules: {
     'prettier/prettier': 'error',
     'react/react-in-jsx-scope': 'off',
@@ -30,11 +25,11 @@ module.exports = {
     'jsx-a11y/no-static-element-interactions': 'warn',
     'import/order': ['error', { 'newlines-between': 'always' }],
     '@typescript-eslint/no-non-null-assertion': 'warn',
-    'prefer-const': 'error'
+    'prefer-const': 'error',
   },
   settings: {
     react: {
-      version: 'detect'
-    }
-  }
+      version: 'detect',
+    },
+  },
 };

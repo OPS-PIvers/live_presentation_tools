@@ -20,6 +20,7 @@ Create a `.env.local` file in the root directory and set `GEMINI_API_KEY` to you
 ## Architecture
 
 ### Core State Management
+
 - **Slides**: Array of slide objects, each containing media, transform state, and spotlight state
 - **Tools**: Enum-based tool system (NONE, PAN_ZOOM, SPOTLIGHT)
 - **Recording System**: Click sequence recording with replay functionality
@@ -50,6 +51,7 @@ Create a `.env.local` file in the root directory and set `GEMINI_API_KEY` to you
   - `ClickRecord`: Recorded interactions with state snapshots
 
 ### File Organization
+
 - `/components/` - React components (Canvas, Toolbar, icons)
 - `/hooks/` - Custom React hooks (useKeyboardShortcuts)
 - Root level - Main app files (App.tsx, index.tsx, types.ts)

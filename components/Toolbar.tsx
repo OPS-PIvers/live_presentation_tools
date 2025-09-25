@@ -59,7 +59,9 @@ const ToolButton: React.FC<{
       title={finalTitle}
     >
       {icon}
-      <span className="text-xs mt-1 font-semibold hidden sm:block">{label}</span>
+      <span className="text-xs mt-1 font-semibold hidden sm:block">
+        {label}
+      </span>
     </button>
   );
 };

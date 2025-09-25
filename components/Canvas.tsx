@@ -81,7 +81,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     }
   };
 
-  const handleKeyboardActivation = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyboardActivation = () => {
     if (isPlaying || activeTool === Tool.SPOTLIGHT) return;
 
     // For keyboard activation, use center of canvas as the click point
@@ -230,7 +230,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          handleKeyboardActivation(e);
+          handleKeyboardActivation();
         }
       }}
       onDoubleClick={handleDoubleClick}
@@ -261,6 +261,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               className="max-w-full max-h-full object-contain shadow-lg"
               controls
             >
+              <track kind="captions" />
             </video>
           )}
         </div>
