@@ -7,6 +7,7 @@ import {
   SpotlightIcon,
   CaptureIcon,
   PlayIcon,
+  StepIcon,
   ResetIcon,
   PlusIcon,
 } from './icons';
@@ -15,6 +16,7 @@ interface ToolbarProps {
   activeTool: Tool;
   setActiveTool: React.Dispatch<React.SetStateAction<Tool>>;
   onReplay: () => void;
+  onStepReplay: () => void;
   onReset: () => void;
   hasSequence: boolean;
   isCapturing: boolean;
@@ -70,6 +72,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   activeTool,
   setActiveTool,
   onReplay,
+  onStepReplay,
   onReset,
   hasSequence,
   isCapturing,
@@ -135,6 +138,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           title="Replay Click Sequence"
           icon={<PlayIcon className="w-6 h-6" />}
           onClick={onReplay}
+          disabled={!hasSequence}
+          isActive={false}
+        />
+        <ToolButton
+          label="Step"
+          title="Step-by-step Replay"
+          icon={<StepIcon className="w-6 h-6" />}
+          onClick={onStepReplay}
           disabled={!hasSequence}
           isActive={false}
         />
