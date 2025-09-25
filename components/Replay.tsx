@@ -4,8 +4,8 @@ import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 interface ReplayControlsProps {
   onNext: () => void;
-  onPrev: () -> void;
-  onExit: () -> void;
+  onPrev: () => void;
+  onExit: () => void;
   currentStep: number;
   totalSteps: number;
 }
