@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { Toolbar } from './components/Toolbar';
 import { Canvas } from './components/Canvas';
+import { ReplayControls } from './components/Replay';
 import {
   Tool,
   CanvasTransform,
@@ -28,6 +29,8 @@ const App: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [clickSequence, setClickSequence] = useState<ClickRecord[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isStepping, setIsStepping] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   const [replayCursor, setReplayCursor] = useState<{
     x: number;
     y: number;
@@ -129,6 +132,34 @@ const App: React.FC = () => {
     }
   };
 
+  const handleStepReplay = () => {
+    if (clickSequence.length > 0 && !isStepping) {
+      setIsStepping(true);
+      setCurrentStep(0);
+      // Reset all slides to initial state before starting
+      setSlides((prev) =>
+        prev.map((slide) => ({
+          ...slide,
+          transform: INITIAL_TRANSFORM,
+          spotlight: null,
+        }))
+      );
+    }
+  };
+
+  const handleNextStep = () => {
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const handleExitStepping = () => {
+    setIsStepping(false);
+    setCurrentStep(0);
+  };
+
   const handleFullReset = () => {
     slides.forEach((slide) => {
       if (slide.mediaUrl) URL.revokeObjectURL(slide.mediaUrl);
@@ -140,6 +171,26 @@ const App: React.FC = () => {
     setActiveTool(Tool.NONE);
     setIsCapturing(false);
   };
+
+  useEffect(() => {
+    if (!isStepping || clickSequence.length === 0) return;
+
+    const record = clickSequence[currentStep];
+    if (!record) return;
+
+    setCurrentSlideIndex(record.slideIndex);
+
+    setReplayCursor({
+      x: record.x,
+      y: record.y,
+      slideIndex: record.slideIndex,
+    });
+
+    updateSlideState(record.slideIndex, {
+      transform: record.toolState.transform,
+      spotlight: record.toolState.spotlight,
+    });
+  }, [isStepping, currentStep, clickSequence, updateSlideState]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -211,6 +262,7 @@ const App: React.FC = () => {
         activeTool={activeTool}
         setActiveTool={setActiveTool}
         onReplay={handleReplay}
+        onStepReplay={handleStepReplay}
         onReset={handleFullReset}
         hasSequence={clickSequence.length > 0 && !isPlaying}
         isCapturing={isCapturing}
@@ -220,6 +272,15 @@ const App: React.FC = () => {
         totalSlides={slides.length}
       />
       <main className="flex-grow pb-[120px] sm:pb-0 sm:pt-[80px] relative">
+        {isStepping && (
+          <ReplayControls
+            onNext={handleNextStep}
+            onPrev={handlePrevStep}
+            onExit={handleExitStepping}
+            currentStep={currentStep}
+            totalSteps={clickSequence.length}
+          />
+        )}
         <div
           className="w-full h-full flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentSlideIndex * 100}%)` }}

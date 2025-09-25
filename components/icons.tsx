@@ -17,6 +17,23 @@ export const ZoomIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
+export const StepIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 6v12M10 12l6-6v12l-6-6z"
+    />
+  </svg>
+);
+
 export const SpotlightIcon: React.FC<{ className?: string }> = ({
   className,
 }) => (
