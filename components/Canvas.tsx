@@ -339,11 +339,10 @@ export const Canvas: React.FC<CanvasProps> = ({
 
       {replayCursorPos && (
         <div
-          className="absolute z-50 w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-lg pointer-events-none transition-transform duration-75"
+          className="absolute z-50 w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-lg pointer-events-none"
           style={{
-            left: 0,
-            top: 0,
-            transform: `translate(${replayCursorPos.x - 16}px, ${replayCursorPos.y - 16}px)`,
+            left: transform.x + replayCursorPos.x * transform.scale - 16,
+            top: transform.y + replayCursorPos.y * transform.scale - 16,
           }}
         >
           <div className="w-full h-full rounded-full bg-yellow-400 animate-ping"></div>
