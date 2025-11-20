@@ -10,6 +10,7 @@ import {
   StepIcon,
   ResetIcon,
   PlusIcon,
+  HelpIcon,
 } from './icons';
 
 interface ToolbarProps {
@@ -24,6 +25,7 @@ interface ToolbarProps {
   onAddSlide: () => void;
   currentSlideIndex: number;
   totalSlides: number;
+  onOpenHelp: () => void;
 }
 
 const ToolButton: React.FC<{
@@ -80,13 +82,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onAddSlide,
   currentSlideIndex,
   totalSlides,
+  onOpenHelp,
 }) => {
   return (
     <div
       role="toolbar"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md sm:w-auto sm:max-w-none sm:bottom-auto sm:top-4 bg-gray-800 bg-opacity-80 backdrop-blur-sm p-2 sm:p-3 rounded-xl shadow-2xl border border-gray-700"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-max max-w-[95vw] sm:w-auto sm:max-w-none sm:bottom-auto sm:top-4 bg-gray-800 bg-opacity-80 backdrop-blur-sm p-2 sm:p-3 rounded-xl shadow-2xl border border-gray-700 overflow-x-auto"
     >
-      <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4">
+      <div className="flex flex-nowrap justify-start sm:justify-center items-center gap-2 sm:gap-4 min-w-max">
         <ToolButton
           label="Pan/Zoom"
           shortcut="A"
@@ -154,6 +157,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           title="Reset Presentation"
           icon={<ResetIcon className="w-6 h-6" />}
           onClick={onReset}
+        />
+        <div className="w-px h-10 bg-gray-600 hidden sm:block"></div>
+        <ToolButton
+          label="Help"
+          title="Keyboard Shortcuts & Help"
+          icon={<HelpIcon className="w-6 h-6" />}
+          onClick={onOpenHelp}
         />
       </div>
     </div>

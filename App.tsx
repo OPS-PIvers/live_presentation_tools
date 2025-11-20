@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Toolbar } from './components/Toolbar';
 import { Canvas } from './components/Canvas';
 import { ReplayControls } from './components/Replay';
+import { HelpModal } from './components/HelpModal';
 import {
   Tool,
   CanvasTransform,
@@ -31,6 +32,7 @@ const App: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isStepping, setIsStepping] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [replayCursor, setReplayCursor] = useState<{
     x: number;
     y: number;
@@ -258,6 +260,7 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-900 font-sans overflow-hidden">
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <Toolbar
         activeTool={activeTool}
         setActiveTool={setActiveTool}
@@ -270,8 +273,15 @@ const App: React.FC = () => {
         onAddSlide={addSlide}
         currentSlideIndex={currentSlideIndex}
         totalSlides={slides.length}
+        onOpenHelp={() => setIsHelpOpen(true)}
       />
       <main className="flex-grow pb-[120px] sm:pb-0 sm:pt-[80px] relative">
+        {isCapturing && (
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-1 bg-red-600 text-white rounded-full shadow-lg animate-pulse pointer-events-none">
+            <div className="w-3 h-3 bg-white rounded-full" />
+            <span className="text-sm font-bold">REC</span>
+          </div>
+        )}
         {isStepping && (
           <ReplayControls
             onNext={handleNextStep}
