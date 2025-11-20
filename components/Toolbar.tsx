@@ -10,6 +10,7 @@ import {
   StepIcon,
   ResetIcon,
   PlusIcon,
+  HelpIcon,
 } from './icons';
 
 interface ToolbarProps {
@@ -24,6 +25,7 @@ interface ToolbarProps {
   onAddSlide: () => void;
   currentSlideIndex: number;
   totalSlides: number;
+  onOpenHelp: () => void;
 }
 
 const ToolButton: React.FC<{
@@ -80,6 +82,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onAddSlide,
   currentSlideIndex,
   totalSlides,
+  onOpenHelp,
 }) => {
   return (
     <div
@@ -154,6 +157,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           title="Reset Presentation"
           icon={<ResetIcon className="w-6 h-6" />}
           onClick={onReset}
+        />
+        <div className="w-px h-10 bg-gray-600 hidden sm:block"></div>
+        <ToolButton
+          label="Help"
+          title="Keyboard Shortcuts & Help"
+          icon={<HelpIcon className="w-6 h-6" />}
+          onClick={onOpenHelp}
         />
       </div>
     </div>
