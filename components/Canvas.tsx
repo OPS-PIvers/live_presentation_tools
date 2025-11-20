@@ -282,24 +282,36 @@ export const Canvas: React.FC<CanvasProps> = ({
           )}
         </div>
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-500 text-lg sm:text-xl md:text-2xl font-semibold border-4 border-dashed border-gray-600 rounded-2xl">
-          <div className="p-4 space-y-4 flex items-center justify-center flex-col">
-            <p>Paste, drop, or upload media files</p>
-            <button
-              onClick={handleUploadClick}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-base font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-              <UploadIcon className="w-5 h-5" />
-              Choose File
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,video/*"
-              onChange={handleFileChange}
-              className="hidden"
-              aria-label="Upload media file"
-            />
+        <div className="w-full h-full flex items-center justify-center p-8">
+          <div className="w-full max-w-2xl h-3/4 flex flex-col items-center justify-center text-gray-400 border-4 border-dashed border-gray-700 rounded-3xl bg-gray-800/50 hover:bg-gray-800 hover:border-cyan-500/50 transition-all duration-300 group">
+            <div className="space-y-6 text-center">
+              <div className="w-20 h-20 mx-auto bg-gray-700 rounded-full flex items-center justify-center group-hover:bg-cyan-900/30 transition-colors duration-300">
+                <UploadIcon className="w-10 h-10 text-gray-500 group-hover:text-cyan-400 transition-colors duration-300" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-gray-200">
+                  Add Content
+                </h3>
+                <p className="text-lg text-gray-500">
+                  Paste, drop, or select a media file to get started
+                </p>
+              </div>
+              <button
+                onClick={handleUploadClick}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-lg font-semibold rounded-xl shadow-lg shadow-cyan-900/20 hover:shadow-cyan-900/40 transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-cyan-500/30"
+              >
+                <UploadIcon className="w-5 h-5" />
+                Choose File
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
+                aria-label="Upload media file"
+              />
+            </div>
           </div>
         </div>
       )}
